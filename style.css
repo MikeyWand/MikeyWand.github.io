@@ -35,9 +35,11 @@ ul {
 }
 
 .projects__project{
-  width: 35%;
+  padding: 4em;
+  
   border-radius: 25px;
   border: 2px solid black;
+  width: 35%;
 }
 
 footer {
