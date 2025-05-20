@@ -43,6 +43,8 @@ ul {
   border-radius: 20px;
   border: 2px solid black;
   width: 45%;
+
+  text-align:center;
 }
 
 footer {
