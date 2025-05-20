@@ -22,6 +22,7 @@ section {
 
 h1, h2 {
   color: #444;
+  width:100%;
 }
 
 ul {
@@ -37,11 +38,11 @@ ul {
 }
 
 .projects__project{
-  padding: 4em;
+  padding: 3em;
   
-  border-radius: 25px;
+  border-radius: 20px;
   border: 2px solid black;
-  width: 35%;
+  width: 45%;
 }
 
 footer {
