@@ -28,6 +28,18 @@ ul {
   list-style: square inside;
 }
 
+#projects {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.projects__project{
+  width: 35%;
+  border-radius: 25px;
+  border: 2px solid black;
+}
+
 footer {
   background: #eee;
   text-align: center;
