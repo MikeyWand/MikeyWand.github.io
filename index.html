@@ -1,55 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Mike Wand | Web Developer</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mike Wand — Interactive Portfolio</title>
+  <meta name="description" content="The personal playground of Mike Wand — front‑end experiments, parallax art, and underwater daydreams."/>
+  <style>
+    /* ------------------
+       Base + Theme
+    ------------------ */
+    :root {
+      --bg: #0b1021;          /* deep midnight */
+      --fg: #e8f0ff;          /* soft ice */
+      --muted: #9ab0d1;
+      --accent: #80d4ff;      /* airy cyan */
+      --accent-2: #ffd580;    /* warm glow */
+      --ink: #1a2446;         /* panels */
+
+      --maxw: 1120px;
+      --pad: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+      color: var(--fg); background: linear-gradient(#0b1021 0%, #0e1631 50%, #071225 100%);
+      overflow-x: hidden;
+    }
+
+    a { color: var(--accent); text-decoration-thickness: .08em; }
+    a:hover { text-decoration: underline; }
+
+    .container { width: min(100% - 2*var(--pad), var(--maxw)); margin-inline: auto; }
+
+    /* Header (persistent) */
+    header.site {
+      position: fixed; inset: 0 0 auto 0; z-index: 999;
+      display: flex; justify-content: center; pointer-events: none;
+    }
+    header .bar {
+      pointer-events: auto;
+      margin: 12px; padding: 10px 14px; border-radius: 999px;
+      background: color-mix(in oklab, var(--ink) 85%, transparent);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      display: flex; gap: 14px; align-items: center;
+    }
+    header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2); }
+    header nav a { color: var(--fg); opacity: .9; font-weight: 600; text-decoration: none; padding: 6px 10px; border-radius: 8px; }
+    header nav a:hover { background: rgba(255,255,255,.06); }
+
+    /* Sections scaffold (sticky panels) */
+    section.panel { position: relative; min-height: 120vh; display: grid; place-items: center; }
+    .panel .content { width: min(100% - 2*var(--pad), var(--maxw)); margin-inline: auto; }
+
+    /* Parallax stage */
+    .stage { position: absolute; inset: 0; overflow: hidden; perspective: 900px; }
+    .layer { position: absolute; inset: 0; will-change: transform, opacity; }
+
+    /* Scene 1: Sky City (Columbia vibes) */
+    .sky-gradient { background: linear-gradient(180deg, #6cc6ff 0%, #bfe7ff 60%, #e6f6ff 100%); }
+    .clouds { background-image: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">\
+        <defs><radialGradient id="g" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="white"/><stop offset="100%" stop-color="%23e6f6ff"/></radialGradient></defs>\
+        <g opacity="0.7">\
+          <ellipse fill="url(%23g)" cx="200" cy="200" rx="180" ry="90"/>\
+          <ellipse fill="url(%23g)" cx="600" cy="240" rx="220" ry="110"/>\
+          <ellipse fill="url(%23g)" cx="1100" cy="180" rx="260" ry="120"/>\
+          <ellipse fill="url(%23g)" cx="1450" cy="280" rx="200" ry="95"/>\
+        </g>\
+      </svg>');
+      background-repeat: repeat-x; background-size: 1600px 600px; background-position: 0 30%; opacity: .9; filter: blur(2px);
+    }
+    .floating-isles {
+      background-image:
+        radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.4), transparent 70%),
+        radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.35), transparent 70%);
+    }
+    .city-silhouette {
+      mask: linear-gradient(180deg, rgba(0,0,0,.95) 20%, rgba(0,0,0,0) 100%);
+      background: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800">\
+          <g fill="%231a2446" opacity="0.8">\
+            <path d="M0 600h200l20-80 40-10 30-90 50 30 30-60 60 20 20-50 50 10 30-100 40 140 50-20 20 120h120l40-60 60 40 30-80 70 20 20-50 60 40 40-80 40 50 60-10 20 120h280v200H0z"/>\
+          </g>\
+        </svg>') bottom center / cover no-repeat;
+      opacity: .8;
+    }
+
+    .hero {
+      text-align: center; padding-top: 18vh; padding-bottom: 20vh;
+      text-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    .hero h1 { font-size: clamp(2.2rem, 6vw, 5rem); letter-spacing: .5px; margin: 0 0 .2em; }
+    .hero p.kicker { color: #14365c; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; font-size: .85rem; }
+    .hero .cta { margin-top: 18px; display: inline-flex; gap: 10px; }
+    .btn { display: inline-flex; align-items: center; gap: .5rem; padding: 10px 14px; border-radius: 14px; background: #1a2446; color: var(--fg); border: 1px solid rgba(255,255,255,.08); text-decoration: none; }
+    .btn:hover { background: #223163; }
+
+    /* Scene 2: Surface / Descent */
+    .surface-gradient { background: linear-gradient(#76b8ff 0%, #0e4c8a 70%, #062138 100%); }
+    .sun-glow { background: radial-gradient(500px 300px at 50% 20%, rgba(255,213,128,.8), rgba(255,213,128,0) 60%); mix-blend-mode: screen; }
+    .waves { background-image: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">\
+        <path d="M0,200 C300,100 500,300 800,200 C1100,100 1300,300 1600,200 L1600,400 L0,400 Z" fill="%23093b64" opacity="0.55"/>\
+        <path d="M0,220 C300,120 500,320 800,220 C1100,120 1300,320 1600,220 L1600,400 L0,400 Z" fill="%230d4a7d" opacity="0.45"/>\
+        <path d="M0,240 C300,140 500,340 800,240 C1100,140 1300,340 1600,240 L1600,400 L0,400 Z" fill="%2312589a" opacity="0.35"/>\
+      </svg>');
+      background-repeat: repeat-x; background-size: 1600px 400px; background-position: 0 80%; opacity: .8;
+    }
+    .bubbles { background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,.15) 0 2px, transparent 3px), radial-gradient(circle at 60% 70%, rgba(255,255,255,.15) 0 2px, transparent 3px), radial-gradient(circle at 80% 90%, rgba(255,255,255,.15) 0 2px, transparent 3px); background-size: 200px 200px; background-repeat: repeat; opacity: .6; }
+
+    /* Scene 3: Rapture vibes */
+    .deep-gradient { background: radial-gradient(800px 500px at 50% 20%, #0a2a43, #061a2b 70%, #030c16 100%); }
+    .rapture-silhouette {
+      background: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
+          <g fill="%23061a2b" opacity="0.85">\
+            <rect x="0" y="700" width="1600" height="200"/>\
+            <path d="M50 700 L120 560 L180 700 Z"/>\
+            <path d="M260 700 L320 520 L380 700 Z"/>\
+            <path d="M460 700 L520 500 L580 700 Z"/>\
+            <path d="M720 700 L780 520 L840 700 Z"/>\
+            <path d="M980 700 L1040 540 L1100 700 Z"/>\
+            <path d="M1250 700 L1300 500 L1360 700 Z"/>\
+          </g>\
+        </svg>') bottom center / cover no-repeat;
+      opacity: .9;
+    }
+    .shafts { background: repeating-linear-gradient(180deg, rgba(128,212,255,.06) 0 8px, transparent 8px 24px); mix-blend-mode: screen; }
+
+    /* Text blocks */
+    .card { background: rgba(26,36,70,.55); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: clamp(16px, 3vw, 28px); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
+    .card h2 { margin-top: 0; letter-spacing: .5px; }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    /* Footer */
+    footer.site { padding: 40px var(--pad); text-align: center; color: var(--muted); }
+
+    /* Motion & Parallax */
+    @media (prefers-reduced-motion: no-preference) {
+      .parallax [data-speed] { transform: translateY(calc(var(--scroll, 0) * var(--speed, 0))); }
+      .floaty { animation: float 6s ease-in-out infinite; }
+      @keyframes float { 0%,100% { transform: translateY(-4px) } 50% { transform: translateY(4px) } }
+    }
+
+    @media (max-width: 640px) {
+      header .bar { gap: 8px; }
+      .hero h1 { font-size: clamp(2rem, 9vw, 3.2rem); }
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Mike Wand</h1>
-    <p>Front-End Web Developer</p>
+  <header class="site" aria-label="Primary">
+    <div class="bar">
+      <div class="dot" aria-hidden="true"></div>
+      <nav>
+        <a href="#sky">Sky City</a>
+        <a href="#surface">Surface</a>
+        <a href="#deep">Underwater</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <section id="about">
-    <h2>About Me</h2>
-    <p>I'm a front-end developer with experience in HTML, CSS, JavaScript, and modern tools like Vite. After several years at Kohl's Corporate, I'm re-launching my personal site to showcase my work.</p>
+  <!-- =====================
+       SCENE 1 — SKY CITY
+  ====================== -->
+  <section id="sky" class="panel">
+    <div class="stage parallax" aria-hidden="true">
+      <div class="layer sky-gradient" data-speed="0.10"></div>
+      <div class="layer clouds" data-speed="0.18"></div>
+      <div class="layer floating-isles" data-speed="0.25"></div>
+      <div class="layer city-silhouette" data-speed="0.35"></div>
+    </div>
+
+    <div class="content hero">
+      <p class="kicker">Interactive Portfolio</p>
+      <h1 class="floaty">Hi, I'm Mike Wand.</h1>
+      <p class="lead">I design & build animated, user‑friendly experiences. Scroll to descend from a sky city into the deep.</p>
+      <div class="cta">
+        <a class="btn" href="#surface" aria-label="Descend to the ocean surface">Start Descent ↓</a>
+        <a class="btn" href="#projects">See Projects</a>
+      </div>
+    </div>
   </section>
 
-  <section id="skills">
-    <h2>Skills</h2>
-    <ul>
-      <li>HTML5</li>
-      <li>CSS3 / SCSS</li>
-      <li>JavaScript (ES6+)</li>
-      <li>Vite / Gulp</li>
-      <li>Git & GitHub</li>
-    </ul>
+  <!-- =====================
+       SCENE 2 — SURFACE
+  ====================== -->
+  <section id="surface" class="panel">
+    <div class="stage parallax" aria-hidden="true">
+      <div class="layer surface-gradient" data-speed="0.10"></div>
+      <div class="layer sun-glow" data-speed="0.12"></div>
+      <div class="layer waves" data-speed="0.20"></div>
+      <div class="layer bubbles" data-speed="0.28"></div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h2>About Mike</h2>
+        <p>
+          Front‑end developer with a love for motion design, performance, and bringing playful ideas to life. I’ve worked on creative tooling (Gulp → Vite), component systems, and production‑ready builds at scale. My personal work leans whimsical — like this little sky‑to‑sea journey.
+        </p>
+        <div class="grid" style="margin-top: 14px;">
+          <div>
+            <h3>Focus</h3>
+            <ul>
+              <li>Accessible animation</li>
+              <li>Design‑systems thinking</li>
+              <li>Performance & DX</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Toolkit</h3>
+            <ul>
+              <li>HTML • CSS • JS/TS</li>
+              <li>Vite • GitHub Pages</li>
+              <li>React • Tailwind (when it fits)</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Currently</h3>
+            <ul>
+              <li>Rebuilding <em>MikeWand.com</em></li>
+              <li>Experimenting with scroll stories</li>
+              <li>Open to collab & ideas</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <p>Coming soon: real-world projects showcasing UI design, performance optimizations, and workflow automation.</p>
-    <a target="_blank" href="https://codepen.io/MikeWand/full/BbeZBa" class="projects__project">
-      <h3>ABC Matchup Game</h3>
-    </a>
-    <a target="_blank" href="https://codepen.io/MikeWand/full/eYYOYod" class="projects__project">
-      <h3>Flex box resizing example</h3>
-    </a>
+  <!-- =====================
+       SCENE 3 — DEEP / RAPTURE VIBES
+  ====================== -->
+  <section id="deep" class="panel">
+    <div class="stage parallax" aria-hidden="true">
+      <div class="layer deep-gradient" data-speed="0.08"></div>
+      <div class="layer shafts" data-speed="0.14"></div>
+      <div class="layer rapture-silhouette" data-speed="0.26"></div>
+    </div>
+
+    <div class="content" id="projects">
+      <div class="card">
+        <h2>Projects</h2>
+        <p>Hand‑picked work that pairs craft with performance. More soon — for now, placeholders:</p>
+        <div class="grid" style="margin-top: 16px;">
+          <div class="card" style="background: rgba(255,255,255,.02);">
+            <h3>Parallax Story Engine</h3>
+            <p>Lightweight scroll controller powering this page (no frameworks). Plug layers, set speeds, go.</p>
+            <a href="#" aria-disabled="true">Case study (coming)</a>
+          </div>
+          <div class="card" style="background: rgba(255,255,255,.02);">
+            <h3>Build Pipeline Revamp</h3>
+            <p>Migrated legacy Gulp builds to Vite with single‑file outputs, image revving, and DM Classic paths.</p>
+            <a href="#" aria-disabled="true">Write‑up (coming)</a>
+          </div>
+          <div class="card" style="background: rgba(255,255,255,.02);">
+            <h3>Micro‑Interactions</h3>
+            <p>Small, delightful components — buttons with personality that still pass a11y audits.</p>
+            <a href="#" aria-disabled="true">Gallery (coming)</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="contact" style="margin-top: 18px; text-align:center;">
+        <h2>Say hello</h2>
+        <p>
+          <a href="mailto:mikewand@gmail.com" class="btn">✉️  mikewand@gmail.com</a>
+        </p>
+        <p style="color: var(--muted); font-size: .95rem;">Last updated: <span id="lastUpdated">—</span></p>
+      </div>
+    </div>
   </section>
 
-  <section id="contact">
-    <h2>Contact</h2>
-    <p>Email: <a href="mailto:mikeywand3@gmail.com">mikeywand3@gmail.com</a></p>
-  </section>
-<footer>
-  <p>© 2025 Mike Wand • Last updated: <span id="lastUpdated"></span></p>
-</footer>
+  <footer class="site">
+    <small>© <span id="year"></span> Mike Wand. Built with vanilla HTML/CSS/JS. Respecting <code>prefers-reduced-motion</code>.</small>
+  </footer>
 
-<script>
-  document.getElementById('lastUpdated').textContent =
-    new Date(document.lastModified).toLocaleDateString();
-</script>
+  <script>
+    // ---------------------------
+    // Parallax Controller
+    // ---------------------------
+    (function() {
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return; // bail on motion-sensitive users
+
+      const layers = Array.from(document.querySelectorAll('.parallax [data-speed]'));
+
+      function tick() {
+        // Use scrollY as a single driver — cheap and cheerful
+        const s = window.scrollY || 0;
+        // expose to CSS as a variable; each layer multiplies by its own speed
+        document.documentElement.style.setProperty('--scroll', s);
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      // Also set each element's speed as a CSS var for the transform formula
+      layers.forEach(el => {
+        const v = parseFloat(el.getAttribute('data-speed')) || 0;
+        el.style.setProperty('--speed', v);
+      });
+    })();
+
+    // ---------------------------
+    // Footer helpers
+    // ---------------------------
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' });
+  </script>
 </body>
 </html>
