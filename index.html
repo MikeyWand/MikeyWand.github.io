@@ -53,7 +53,7 @@
     header nav a:hover { background: rgba(255,255,255,.06); }
 
     /* Sections scaffold (sticky panels) */
-    section.panel { position: relative; min-height: 120vh; display: grid; place-items: center; }
+    section.panel { position: relative; min-height: 160vh; display: grid; place-items: center; }
     .panel .content { width: min(100% - 2*var(--pad), var(--maxw)); margin-inline: auto; }
 
     /* Parallax stage */
@@ -62,22 +62,42 @@
 
     /* Scene 1: Sky City (Columbia vibes) */
     .sky-gradient { background: linear-gradient(180deg, #6cc6ff 0%, #bfe7ff 60%, #e6f6ff 100%); }
+    .sun-rays { background: repeating-conic-gradient(from 0deg at 50% -20%, rgba(255,213,128,.14) 0 6deg, rgba(255,213,128,0) 6deg 16deg); mask: linear-gradient(180deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.2) 45%, rgba(0,0,0,0) 70%); mix-blend-mode: screen; }
     .clouds { background-image: url('data:image/svg+xml;utf8,\
       <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">\
         <defs><radialGradient id="g" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="white"/><stop offset="100%" stop-color="%23e6f6ff"/></radialGradient></defs>\
-        <g opacity="0.7">\
+        <g opacity="0.85">\
           <ellipse fill="url(%23g)" cx="200" cy="200" rx="180" ry="90"/>\
-          <ellipse fill="url(%23g)" cx="600" cy="240" rx="220" ry="110"/>\
-          <ellipse fill="url(%23g)" cx="1100" cy="180" rx="260" ry="120"/>\
-          <ellipse fill="url(%23g)" cx="1450" cy="280" rx="200" ry="95"/>\
+          <ellipse fill="url(%23g)" cx="600" cy="240" rx="260" ry="120"/>\
+          <ellipse fill="url(%23g)" cx="1100" cy="180" rx="320" ry="150"/>\
+          <ellipse fill="url(%23g)" cx="1450" cy="280" rx="260" ry="120"/>\
         </g>\
       </svg>');
-      background-repeat: repeat-x; background-size: 1600px 600px; background-position: 0 30%; opacity: .9; filter: blur(2px);
+      background-repeat: repeat-x; background-size: 1600px 600px; background-position: 0 30%; opacity: .95; filter: blur(1px);
     }
+    .blimp { pointer-events: none; background: url('data:image/svg+xml;utf8,\
+      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="160" viewBox="0 0 400 160">\
+        <defs>\
+          <linearGradient id="skin" x1="0" x2="1">\
+            <stop offset="0%" stop-color="%231a2446"/>\
+            <stop offset="100%" stop-color="%232a3a76"/>\
+          </linearGradient>\
+        </defs>\
+        <g>\
+          <ellipse cx="200" cy="80" rx="170" ry="60" fill="url(%23skin)" stroke="%2380d4ff" stroke-width="2" opacity="0.95"/>\
+          <rect x="160" y="92" width="80" height="14" fill="%231a2446" rx="7"/>\
+          <polygon points="320,80 360,90 320,100" fill="%231a2446" opacity="0.9"/>\
+          <rect x="180" y="108" width="40" height="18" rx="4" fill="%23ffd580" opacity="0.85"/>\
+        </g>\
+      </svg>') no-repeat;
+      background-size: 400px 160px; background-position: var(--blimp-x, -30%) 12%; opacity: .9;
+      animation: blimp-drift 26s linear infinite;
+    }
+    @keyframes blimp-drift { 0% { --blimp-x: -40%; } 100% { --blimp-x: 120%; } }
     .floating-isles {
       background-image:
-        radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.4), transparent 70%),
-        radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.35), transparent 70%);
+        radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.35), transparent 70%),
+        radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.3), transparent 70%);
     }
     .city-silhouette {
       mask: linear-gradient(180deg, rgba(0,0,0,.95) 20%, rgba(0,0,0,0) 100%);
@@ -118,7 +138,7 @@
     .rapture-silhouette {
       background: url('data:image/svg+xml;utf8,\
         <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
-          <g fill="%23061a2b" opacity="0.85">\
+          <g fill="%23061a2b" opacity="0.9">\
             <rect x="0" y="700" width="1600" height="200"/>\
             <path d="M50 700 L120 560 L180 700 Z"/>\
             <path d="M260 700 L320 520 L380 700 Z"/>\
@@ -128,7 +148,24 @@
             <path d="M1250 700 L1300 500 L1360 700 Z"/>\
           </g>\
         </svg>') bottom center / cover no-repeat;
-      opacity: .9;
+      opacity: .95;
+    }
+    .beasts {
+      background: url('data:image/svg+xml;utf8,\
+        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
+          <g fill="%23030c16" opacity="0.6">\
+            <path d="M-100 800 C200 600 300 760 600 620 C760 540 900 700 1100 640 C1300 580 1500 720 1750 600 L1750 900 L-100 900 Z"/>\
+          </g>\
+          <g fill="%23040f1b" opacity="0.55">\
+            <path d="M200 780 Q260 740 320 760 T440 760 Q520 740 560 700 Q600 660 640 680 T720 720"/>\
+          </g>\
+          <g fill="%23040f1b" opacity="0.5">\
+            <circle cx="1180" cy="680" r="40"/>\
+            <circle cx="1212" cy="684" r="6" fill="%2380d4ff" opacity="0.7"/>\
+          </g>\
+        </svg>') bottom center / cover no-repeat;
+      opacity: .7;
+      filter: drop-shadow(0 20px 60px rgba(0,0,0,.6));
     }
     .shafts { background: repeating-linear-gradient(180deg, rgba(128,212,255,.06) 0 8px, transparent 8px 24px); mix-blend-mode: screen; }
 
@@ -171,10 +208,12 @@
   ====================== -->
   <section id="sky" class="panel">
     <div class="stage parallax" aria-hidden="true">
-      <div class="layer sky-gradient" data-speed="0.10"></div>
-      <div class="layer clouds" data-speed="0.18"></div>
-      <div class="layer floating-isles" data-speed="0.25"></div>
-      <div class="layer city-silhouette" data-speed="0.35"></div>
+      <div class="layer sky-gradient" data-speed="0.08"></div>
+      <div class="layer sun-rays" data-speed="0.10"></div>
+      <div class="layer clouds" data-speed="0.16"></div>
+      <div class="layer blimp" data-speed="0.22"></div>
+      <div class="layer floating-isles" data-speed="0.28"></div>
+      <div class="layer city-silhouette" data-speed="0.36"></div>
     </div>
 
     <div class="content hero">
@@ -240,9 +279,10 @@
   ====================== -->
   <section id="deep" class="panel">
     <div class="stage parallax" aria-hidden="true">
-      <div class="layer deep-gradient" data-speed="0.08"></div>
-      <div class="layer shafts" data-speed="0.14"></div>
-      <div class="layer rapture-silhouette" data-speed="0.26"></div>
+      <div class="layer deep-gradient" data-speed="0.06"></div>
+      <div class="layer shafts" data-speed="0.12"></div>
+      <div class="layer beasts" data-speed="0.20"></div>
+      <div class="layer rapture-silhouette" data-speed="0.30"></div>
     </div>
 
     <div class="content" id="projects">
@@ -261,9 +301,14 @@
             <a href="#" aria-disabled="true">Write‑up (coming)</a>
           </div>
           <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>Micro‑Interactions</h3>
-            <p>Small, delightful components — buttons with personality that still pass a11y audits.</p>
-            <a href="#" aria-disabled="true">Gallery (coming)</a>
+            <h3>CodePen Experiments</h3>
+            <p>Small interactions & visual toys I tinker with.</p>
+            <a href="https://codepen.io/MikeWand" target="_blank" rel="noopener">View CodePen profile ↗</a>
+          </div>
+          <div class="card" style="background: rgba(255,255,255,.02);">
+            <h3>GitHub</h3>
+            <p>Source for this site and other public bits.</p>
+            <a href="https://github.com/MikeyWand" target="_blank" rel="noopener">Visit GitHub profile ↗</a>
           </div>
         </div>
       </div>
