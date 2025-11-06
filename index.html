@@ -3,277 +3,218 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mike Wand — Interactive Portfolio</title>
-  <meta name="description" content="The personal playground of Mike Wand — parallax art, scroll stories, and friendly motion."/>
+  <title>Mike Wand — Portfolio</title>
+  <meta name="description" content="Mike Wand — a dark, sleek portfolio with glossy accents and clean motion.">
   <style>
     /* ------------------
-       Base + Theme
+       Theme
     ------------------ */
-    :root {
-      --bg: #0b1021;          /* deep midnight */
-      --fg: #e8f0ff;          /* soft ice */
-      --muted: #9ab0d1;
-      --accent: #80d4ff;      /* airy cyan */
-      --accent-2: #ffd580;    /* warm glow */
-      --ink: #1a2446;         /* panels */
-
-      --maxw: 1120px;
+    :root{
+      --bg: #0b0f1a;          /* deep ink */
+      --panel: #0f1424;       /* card surface */
+      --panel-2: #0a1020;     /* alt panel */
+      --text: #e8efff;        /* primary text */
+      --muted: #97a5c5;
+      --line: #1c2440;
+      --accent-1: #7dd3fc;    /* cyan */
+      --accent-2: #c084fc;    /* purple */
+      --accent-3: #fcd34d;    /* gold */
+      --radius: 18px;
       --pad: 24px;
+      --maxw: 1100px;
     }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0; font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
-      color: var(--fg); background: linear-gradient(#0b1021 0%, #0e1631 50%, #071225 100%);
-      overflow-x: hidden;
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ color-scheme: dark; }
+    body{
+      margin:0; font: 16px/1.6 Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+      color:var(--text); background:
+        radial-gradient(1200px 800px at 20% -10%, #12203a 0%, transparent 60%),
+        radial-gradient(900px 700px at 100% 0%, #121b32 0%, transparent 55%),
+        linear-gradient(#0b0f1a, #0b0f1a);
+      background-attachment: fixed;
     }
 
-    a { color: var(--accent); text-decoration-thickness: .08em; }
-    a:hover { text-decoration: underline; }
+    a{ color: var(--accent-1); text-decoration-thickness: .08em; }
+    a:hover{ text-decoration: underline; }
+    img{ max-width:100%; height:auto; }
 
-    /* Header (persistent) */
-    header.site{ position:fixed; inset:0 0 auto 0; z-index:999; display:flex; justify-content:center; pointer-events:none; }
-    header .bar{ pointer-events:auto; margin:12px; padding:10px 14px; border-radius:999px; background:color-mix(in oklab, var(--ink) 85%, transparent); backdrop-filter:blur(8px); box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; gap:14px; align-items:center; }
-    header .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent-2); box-shadow:0 0 10px var(--accent-2); }
-    header nav a{ color:var(--fg); opacity:.9; font-weight:600; text-decoration:none; padding:6px 10px; border-radius:8px; }
-    header nav a:hover{ background:rgba(255,255,255,.06); }
+    .container{ width:min(100% - 2*var(--pad), var(--maxw)); margin-inline:auto; }
 
-    /* Sections scaffold (sticky panels) */
-    section.panel{ position:relative; min-height:200vh; display:grid; place-items:center; }
-    .panel .content{ width:min(100% - 2*var(--pad), var(--maxw)); margin-inline:auto; }
-
-    /* Parallax stage */
-    .stage{ position:absolute; inset:0; overflow:hidden; perspective:900px; }
-    .layer{ position:absolute; inset:0; will-change:transform,opacity; }
-
-    /* Scene 1: SKY ONLY up top (clouds + rays). City eases in lower. */
-    .sky-gradient{ background:linear-gradient(180deg, #6cc6ff 0%, #bfe7ff 60%, #e6f6ff 100%); }
-    .sun-rays{ background:repeating-conic-gradient(from 0deg at 50% -20%, rgba(255,213,128,.14) 0 6deg, rgba(255,213,128,0) 6deg 16deg); mask:linear-gradient(180deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.2) 45%, rgba(0,0,0,0) 70%); mix-blend-mode:screen; }
-
-    /* Cloud sheets (back/front) */
-    .clouds-back, .clouds-front{ background-image:url('data:image/svg+xml;utf8,\
-      <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">\
-        <defs><radialGradient id="g" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="white"/><stop offset="100%" stop-color="%23e6f6ff"/></radialGradient></defs>\
-        <g opacity="0.9">\
-          <ellipse fill="url(%23g)" cx="220" cy="220" rx="220" ry="110"/>\
-          <ellipse fill="url(%23g)" cx="680" cy="240" rx="340" ry="160"/>\
-          <ellipse fill="url(%23g)" cx="1200" cy="180" rx="360" ry="170"/>\
-        </g>\
-      </svg>'); background-repeat:repeat-x; background-size:1600px 600px; background-position:0 30%; }
-    .clouds-back{ opacity:.75; filter:blur(2px); }
-    .clouds-front{ opacity:.95; filter:blur(1px); }
-
-    /* Optional mood layers */
-    .floating-isles{ background-image: radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.35), transparent 70%), radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.3), transparent 70%); }
-    .city-silhouette{ mask:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,.9) 85%, rgba(0,0,0,1) 100%); background:url('data:image/svg+xml;utf8,\
-        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800">\
-          <g fill="%231a2446" opacity="0.8">\
-            <path d="M0 600h200l20-80 40-10 30-90 50 30 30-60 60 20 20-50 50 10 30-100 40 140 50-20 20 120h120l40-60 60 40 30-80 70 20 20-50 60 40 40-80 40 50 60-10 20 120h280v200H0z"/>\
-          </g>\
-        </svg>') bottom center/cover no-repeat; opacity:.8; }
-
-    /* Title layer (parallax) */
-    .title-layer{ display:grid; place-items:start center; padding-top:12vh; text-align:center; pointer-events:none; z-index:5; }
-    .title-layer h1{ font-size:clamp(3.2rem, 10vw, 7rem); line-height:1; margin:0; letter-spacing:.02em; color:#0f2a45; text-shadow:0 10px 30px rgba(0,0,0,.25); }
-    .title-layer .subtitle{ margin-top:.6rem; font-weight:700; color:#1d3f66; text-shadow:0 6px 24px rgba(0,0,0,.18); }
-
-    /* Scene 2: SURFACE / ABOUT */
-    .surface-gradient{ background:linear-gradient(#76b8ff 0%, #0e4c8a 70%, #062138 100%); }
-    .sun-glow{ background:radial-gradient(500px 300px at 50% 20%, rgba(255,213,128,.8), rgba(255,213,128,0) 60%); mix-blend-mode:screen; }
-    .waves{ background-image:url('data:image/svg+xml;utf8,\
-      <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">\
-        <path d="M0,200 C300,100 500,300 800,200 C1100,100 1300,300 1600,200 L1600,400 L0,400 Z" fill="%23093b64" opacity="0.55"/>\
-        <path d="M0,220 C300,120 500,320 800,220 C1100,120 1300,320 1600,220 L1600,400 L0,400 Z" fill="%230d4a7d" opacity="0.45"/>\
-        <path d="M0,240 C300,140 500,340 800,240 C1100,140 1300,340 1600,240 L1600,400 L0,400 Z" fill="%2312589a" opacity="0.35"/>\
-      </svg>'); background-repeat:repeat-x; background-size:1600px 400px; background-position:0 80%; opacity:.8; }
-
-    /* Scene 3: DEEP — bubbles at bottom */
-    .deep-gradient{ background:radial-gradient(800px 500px at 50% 20%, #0a2a43, #061a2b 70%, #030c16 100%); }
-    .shafts{ background:repeating-linear-gradient(180deg, rgba(128,212,255,.06) 0 8px, transparent 8px 24px); mix-blend-mode:screen; }
-    .abyss-bubbles{ background-image: radial-gradient(circle at 10% 120%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 40% 130%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 70% 125%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 90% 135%, rgba(255,255,255,.12) 0 2px, transparent 3px); background-size:300px 300px; background-repeat:repeat; opacity:.6; animation: rise 24s linear infinite; }
-    @keyframes rise{ from{ background-position-y:0; } to{ background-position-y:-600px; } }
-    .rapture-silhouette{ background:url('data:image/svg+xml;utf8,\
-        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
-          <g fill="%23061a2b" opacity="0.95">\
-            <rect x="0" y="700" width="1600" height="200"/>\
-            <path d="M50 700 L120 560 L180 700 Z"/>\
-            <path d="M260 700 L320 520 L380 700 Z"/>\
-            <path d="M460 700 L520 500 L580 700 Z"/>\
-            <path d="M720 700 L780 520 L840 700 Z"/>\
-            <path d="M980 700 L1040 540 L1100 700 Z"/>\
-            <path d="M1250 700 L1300 500 L1360 700 Z"/>\
-          </g>\
-        </svg>') bottom center/cover no-repeat; opacity:.95; }
-
-    /* Text blocks */
-    .card{ background:rgba(26,36,70,.55); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:clamp(16px, 3vw, 28px); box-shadow:0 20px 60px rgba(0,0,0,.35); }
-    .card h2{ margin-top:0; letter-spacing:.5px; }
-    .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); }
-
-    footer.site{ padding:40px var(--pad); text-align:center; color:var(--muted); }
-
-    /* Motion & Parallax */
-    @media (prefers-reduced-motion: no-preference){
-      .parallax [data-speed]{ transform: translateY(calc(var(--scroll, 0) * var(--speed, 0))); }
-      .floaty{ animation: float 6s ease-in-out infinite; }
-      @keyframes float{ 0%,100%{ transform: translateY(-4px) } 50%{ transform: translateY(4px) } }
+    /* Header */
+    header.site{
+      position:sticky; top:0; z-index:50; backdrop-filter: blur(8px);
+      background: linear-gradient(rgba(11,15,26,.8), rgba(11,15,26,.6)); border-bottom:1px solid var(--line);
     }
+    .nav{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px var(--pad); }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.4px; }
+    .brand .dot{ width:10px; height:10px; border-radius:50%; background: var(--accent-3); box-shadow:0 0 16px var(--accent-3); }
+    .nav a{ color:var(--text); text-decoration:none; opacity:.9; padding:8px 10px; border-radius:10px; }
+    .nav a:hover, .nav a:focus-visible{ background: rgba(255,255,255,.05); outline:none; }
 
-    @media (max-width:640px){ header .bar{ gap:8px; } .title-layer h1{ font-size:clamp(2.4rem, 12vw, 4rem); } section.panel{ min-height:160vh; } }
+    /* Hero */
+    .hero{ position:relative; padding: clamp(56px, 10vh, 120px) 0 48px; }
+    .headline{ font-size: clamp(2.4rem, 6vw, 5rem); line-height:1.1; margin:0 0 .2em; letter-spacing:.02em; }
+    .headline .shine{ background: linear-gradient(90deg, #fff, #b6d8ff, #fff); -webkit-background-clip:text; background-clip:text; color: transparent; position:relative; }
+    .kicker{ color:var(--muted); text-transform:uppercase; letter-spacing:.18em; font-weight:700; font-size:.85rem; }
+    .lede{ color:#cbd6f8; max-width: 58ch; }
+
+    .actions{ display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+    .btn{ position:relative; display:inline-flex; align-items:center; gap:.6rem; padding:10px 14px; border-radius:14px; border:1px solid transparent; color:var(--text); text-decoration:none; background:linear-gradient(#101735,#0d1329) padding-box, linear-gradient(120deg, var(--accent-1), var(--accent-2), var(--accent-3)) border-box; }
+    .btn:hover::before{ transform: translateX(120%) skewX(-20deg); }
+    .btn::before{ content:""; position:absolute; inset:-1px; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%); transform: translateX(-140%) skewX(-20deg); transition: transform .8s cubic-bezier(.2,.6,.2,1); border-radius:inherit; pointer-events:none; }
+
+    /* Sections */
+    section{ padding: 56px 0; }
+
+    /* Cards with glossy gradient borders */
+    .card{ position:relative; border-radius: var(--radius); background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid transparent; background-clip: padding-box, border-box; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+    .card.gradient-border{ background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)) padding-box,
+                           linear-gradient(120deg, rgba(125,211,252,.5), rgba(192,132,252,.5), rgba(252,211,77,.5)) border-box; border:1px solid transparent; }
+    .card .inner{ padding: clamp(16px, 2.6vw, 28px); }
+
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+    /* Project card shine */
+    .project{ overflow:hidden; }
+    .project h3{ margin:0 0 6px; }
+    .project p{ color: var(--muted); margin:0 0 10px; }
+    .project a{ color: var(--accent-1); }
+    .project:hover .sweep{ transform: translateX(140%) skewX(-20deg); }
+    .sweep{ content:""; position:absolute; inset:-1px; background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.25) 50%, transparent 65%); transform: translateX(-140%) skewX(-20deg); transition: transform .9s cubic-bezier(.2,.6,.2,1); border-radius:inherit; pointer-events:none; }
+
+    /* Footer */
+    footer{ border-top:1px solid var(--line); padding:28px 0 48px; color: var(--muted); text-align:center; }
+
+    /* Reveal on scroll */
+    .reveal{ opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in{ opacity:1; transform:none; }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .btn::before, .sweep{ display:none; }
+      .reveal{ opacity:1; transform:none; }
+      *{ animation: none !important; transition: none !important; }
+    }
   </style>
 </head>
 <body>
-  <header class="site" aria-label="Primary">
-    <div class="bar">
-      <div class="dot" aria-hidden="true"></div>
+  <header class="site">
+    <div class="container nav">
+      <div class="brand"><span class="dot"></span> <span>Mike Wand</span></div>
       <nav>
-        <a href="#sky">Sky</a>
-        <a href="#surface">Surface</a>
-        <a href="#deep">Underwater</a>
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
       </nav>
     </div>
   </header>
 
-  <!-- =====================
-       SCENE 1 — SKY (clouds only up top)
-  ====================== -->
-  <section id="sky" class="panel">
-    <div class="stage parallax" aria-hidden="true">
-      <div class="layer sky-gradient" data-speed="0.05"></div>
-      <div class="layer sun-rays" data-speed="0.08"></div>
-      <div class="layer clouds-back" data-speed="0.10"></div>
-      <div class="layer clouds-front" data-speed="0.14"></div>
-      <!-- City fades in near bottom of section for mood; remove if you want pure sky. -->
-      <div class="layer floating-isles" data-speed="0.18"></div>
-      <div class="layer city-silhouette" data-speed="0.28"></div>
-      <!-- Title floats for the first stretch of scroll -->
-      <div class="layer title-layer" data-speed="0.22">
-        <h1>Mike Wand</h1>
-        <p class="subtitle">Artsy, animated, and user‑friendly on purpose.</p>
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <p class="kicker reveal">Creative Developer</p>
+        <h1 class="headline reveal" style="transition-delay:.05s"><span class="shine">Dark, sleek, and delightfully shiny.</span></h1>
+        <p class="lede reveal" style="transition-delay:.1s">I design and build rich, user‑friendly front‑ends with crisp performance and tasteful motion. Have a look around.</p>
+        <div class="actions reveal" style="transition-delay:.15s">
+          <a class="btn" href="https://github.com/MikeyWand" target="_blank" rel="noopener">GitHub ↗</a>
+          <a class="btn" href="mailto:mikewand@gmail.com">Email</a>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="content" aria-hidden="true"></div>
-  </section>
-
-  <!-- =====================
-       SCENE 2 — SURFACE / ABOUT
-  ====================== -->
-  <section id="surface" class="panel">
-    <div class="stage parallax" aria-hidden="true">
-      <div class="layer surface-gradient" data-speed="0.06"></div>
-      <div class="layer sun-glow" data-speed="0.08"></div>
-      <div class="layer waves" data-speed="0.12"></div>
-    </div>
-
-    <div class="content">
-      <div class="card">
-        <h2>About Mike</h2>
-        <p>Front‑end developer who loves motion design, performance, and playful UX. This site is a scroll story: sky → surface → deep, built in vanilla HTML/CSS/JS with accessibility in mind.</p>
-        <div class="grid" style="margin-top:14px;">
-          <div>
-            <h3>Focus</h3>
-            <ul>
-              <li>Accessible animation</li>
-              <li>Design systems & craft</li>
-              <li>Performance & DX</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Toolkit</h3>
-            <ul>
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="container">
+        <div class="card gradient-border reveal">
+          <div class="inner">
+            <h2>About</h2>
+            <p>Hi — I'm Mike. I care about expressive interfaces, polish, and keeping things fast. I like to blend aesthetic experimentation with a pragmatic developer workflow.</p>
+            <ul style="margin:10px 0 0; padding-left:18px; color:var(--muted)">
               <li>HTML • CSS • JS/TS</li>
-              <li>Vite • GitHub Pages</li>
-              <li>React • Tailwind (when it fits)</li>
+              <li>React • Vite • GitHub Pages</li>
+              <li>Accessibility & performance‑first thinking</li>
             </ul>
           </div>
-          <div>
-            <h3>Links</h3>
-            <ul>
-              <li><a href="https://github.com/MikeyWand" target="_blank" rel="noopener">GitHub</a></li>
-              <li><a href="https://codepen.io/MikeWand" target="_blank" rel="noopener">CodePen</a></li>
-            </ul>
-          </div>
+          <span class="sweep" aria-hidden="true"></span>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- =====================
-       SCENE 3 — DEEP (bubbles at bottom)
-  ====================== -->
-  <section id="deep" class="panel">
-    <div class="stage parallax" aria-hidden="true">
-      <div class="layer deep-gradient" data-speed="0.05"></div>
-      <div class="layer shafts" data-speed="0.10"></div>
-      <div class="layer abyss-bubbles" data-speed="0.16"></div>
-      <div class="layer rapture-silhouette" data-speed="0.24"></div>
-    </div>
+    <!-- WORK / PROJECTS -->
+    <section id="work">
+      <div class="container">
+        <h2 class="reveal">Selected Work</h2>
+        <div class="grid">
+          <article class="card project reveal" style="transition-delay:.05s">
+            <div class="inner">
+              <h3>Portfolio Engine</h3>
+              <p>Single‑file static site with glossy accents and a11y‑friendly motion.</p>
+              <a href="#" aria-disabled="true">Case study (soon)</a>
+            </div>
+            <span class="sweep" aria-hidden="true"></span>
+          </article>
 
-    <div class="content">
-      <div class="card" id="projects">
-        <h2>Projects</h2>
-        <p>Add links/screenshots here and I’ll wire them into the layout.</p>
-        <div class="grid" style="margin-top:16px;">
-          <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>Parallax Story Engine</h3>
-            <p>Lightweight scroll controller powering this page (no frameworks). Plug layers, set speeds, go.</p>
-          </div>
-          <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>Build Pipeline Revamp</h3>
-            <p>Migrated legacy Gulp builds to Vite with single‑file outputs and image revving.</p>
-          </div>
-          <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>Micro‑Interactions</h3>
-            <p>Small, delightful components — buttons with personality that still pass a11y audits.</p>
-          </div>
+          <article class="card project reveal" style="transition-delay:.1s">
+            <div class="inner">
+              <h3>Build Pipeline Revamp</h3>
+              <p>Gulp ➜ Vite migration, image revving, and faster local DX.</p>
+              <a href="#" aria-disabled="true">Write‑up (soon)</a>
+            </div>
+            <span class="sweep" aria-hidden="true"></span>
+          </article>
+
+          <article class="card project reveal" style="transition-delay:.15s">
+            <div class="inner">
+              <h3>Micro‑Interactions</h3>
+              <p>Small components with personality that still pass a11y audits.</p>
+              <a href="https://codepen.io/MikeWand" target="_blank" rel="noopener">CodePen ↗</a>
+            </div>
+            <span class="sweep" aria-hidden="true"></span>
+          </article>
         </div>
       </div>
+    </section>
 
-      <div class="card" id="contact" style="margin-top:18px; text-align:center;">
-        <h2>Say hello</h2>
-        <p><a href="mailto:mikewand@gmail.com" class="btn" style="display:inline-block; padding:10px 14px; border-radius:14px; background:#1a2446; color:var(--fg); border:1px solid rgba(255,255,255,.08); text-decoration:none;">✉️  mikewand@gmail.com</a></p>
-        <p style="color: var(--muted); font-size: .95rem;">Last updated: <span id="lastUpdated">—</span></p>
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="container">
+        <div class="card gradient-border reveal">
+          <div class="inner" style="text-align:center">
+            <h2>Say hello</h2>
+            <p><a class="btn" href="mailto:mikewand@gmail.com">✉️  mikewand@gmail.com</a></p>
+            <p style="color:var(--muted); font-size:.95rem">Last updated: <span id="lastUpdated">—</span></p>
+          </div>
+          <span class="sweep" aria-hidden="true"></span>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <footer class="site">
-    <small>© <span id="year"></span> Mike Wand. Built with vanilla HTML/CSS/JS. Respects <code>prefers-reduced-motion</code>.</small>
+  <footer>
+    <div class="container">
+      <small>© <span id="year"></span> Mike Wand • Built with HTML/CSS/JS • Respects <code>prefers-reduced-motion</code>.</small>
+    </div>
   </footer>
 
   <script>
-    // ---------------------------
-    // Parallax Controller
-    // ---------------------------
+    // Reveal-on-scroll
     (function(){
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (prefersReduced) return; // bail on motion-sensitive users
-
-      const layers = Array.from(document.querySelectorAll('.parallax [data-speed]'));
-      layers.forEach(el => { el.style.setProperty('--speed', parseFloat(el.getAttribute('data-speed')) || 0); });
-
-      let ticking = false;
-      function onScroll(){
-        if(!ticking){
-          window.requestAnimationFrame(() => {
-            const s = window.scrollY || 0;
-            document.documentElement.style.setProperty('--scroll', s);
-            ticking = false;
-          });
-          ticking = true;
-        }
-      }
-      onScroll();
-      window.addEventListener('scroll', onScroll, { passive:true });
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduced) return;
+      const els = document.querySelectorAll('.reveal');
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, { rootMargin: '0px 0px -10% 0px', threshold: .12 });
+      els.forEach(el=>io.observe(el));
     })();
 
     // Footer helpers
     document.getElementById('year').textContent = new Date().getFullYear();
     const lu = document.getElementById('lastUpdated');
-    if(lu){ lu.textContent = new Date(document.lastModified).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' }); }
+    if(lu){ lu.textContent = new Date(document.lastModified).toLocaleDateString([], { year:'numeric', month:'short', day:'2-digit' }); }
   </script>
 </body>
 </html>
