@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mike Wand — Interactive Portfolio</title>
-  <meta name="description" content="The personal playground of Mike Wand — front‑end experiments, parallax art, and underwater daydreams."/>
+  <meta name="description" content="The personal playground of Mike Wand — parallax art, scroll stories, and friendly motion."/>
   <style>
     /* ------------------
        Base + Theme
@@ -33,112 +33,70 @@
     a { color: var(--accent); text-decoration-thickness: .08em; }
     a:hover { text-decoration: underline; }
 
-    .container { width: min(100% - 2*var(--pad), var(--maxw)); margin-inline: auto; }
-
     /* Header (persistent) */
-    header.site {
-      position: fixed; inset: 0 0 auto 0; z-index: 999;
-      display: flex; justify-content: center; pointer-events: none;
-    }
-    header .bar {
-      pointer-events: auto;
-      margin: 12px; padding: 10px 14px; border-radius: 999px;
-      background: color-mix(in oklab, var(--ink) 85%, transparent);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      display: flex; gap: 14px; align-items: center;
-    }
-    header .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 10px var(--accent-2); }
-    header nav a { color: var(--fg); opacity: .9; font-weight: 600; text-decoration: none; padding: 6px 10px; border-radius: 8px; }
-    header nav a:hover { background: rgba(255,255,255,.06); }
+    header.site{ position:fixed; inset:0 0 auto 0; z-index:999; display:flex; justify-content:center; pointer-events:none; }
+    header .bar{ pointer-events:auto; margin:12px; padding:10px 14px; border-radius:999px; background:color-mix(in oklab, var(--ink) 85%, transparent); backdrop-filter:blur(8px); box-shadow:0 10px 30px rgba(0,0,0,.35); display:flex; gap:14px; align-items:center; }
+    header .dot{ width:8px; height:8px; border-radius:50%; background:var(--accent-2); box-shadow:0 0 10px var(--accent-2); }
+    header nav a{ color:var(--fg); opacity:.9; font-weight:600; text-decoration:none; padding:6px 10px; border-radius:8px; }
+    header nav a:hover{ background:rgba(255,255,255,.06); }
 
     /* Sections scaffold (sticky panels) */
-    section.panel { position: relative; min-height: 160vh; display: grid; place-items: center; }
-    .panel .content { width: min(100% - 2*var(--pad), var(--maxw)); margin-inline: auto; }
+    section.panel{ position:relative; min-height:200vh; display:grid; place-items:center; }
+    .panel .content{ width:min(100% - 2*var(--pad), var(--maxw)); margin-inline:auto; }
 
     /* Parallax stage */
-    .stage { position: absolute; inset: 0; overflow: hidden; perspective: 900px; }
-    .layer { position: absolute; inset: 0; will-change: transform, opacity; }
+    .stage{ position:absolute; inset:0; overflow:hidden; perspective:900px; }
+    .layer{ position:absolute; inset:0; will-change:transform,opacity; }
 
-    /* Scene 1: Sky City (Columbia vibes) */
-    .sky-gradient { background: linear-gradient(180deg, #6cc6ff 0%, #bfe7ff 60%, #e6f6ff 100%); }
-    .sun-rays { background: repeating-conic-gradient(from 0deg at 50% -20%, rgba(255,213,128,.14) 0 6deg, rgba(255,213,128,0) 6deg 16deg); mask: linear-gradient(180deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.2) 45%, rgba(0,0,0,0) 70%); mix-blend-mode: screen; }
-    .clouds { background-image: url('data:image/svg+xml;utf8,\
+    /* Scene 1: SKY ONLY up top (clouds + rays). City eases in lower. */
+    .sky-gradient{ background:linear-gradient(180deg, #6cc6ff 0%, #bfe7ff 60%, #e6f6ff 100%); }
+    .sun-rays{ background:repeating-conic-gradient(from 0deg at 50% -20%, rgba(255,213,128,.14) 0 6deg, rgba(255,213,128,0) 6deg 16deg); mask:linear-gradient(180deg, rgba(0,0,0,.9) 0%, rgba(0,0,0,.2) 45%, rgba(0,0,0,0) 70%); mix-blend-mode:screen; }
+
+    /* Cloud sheets (back/front) */
+    .clouds-back, .clouds-front{ background-image:url('data:image/svg+xml;utf8,\
       <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600" viewBox="0 0 1600 600">\
         <defs><radialGradient id="g" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="white"/><stop offset="100%" stop-color="%23e6f6ff"/></radialGradient></defs>\
-        <g opacity="0.85">\
-          <ellipse fill="url(%23g)" cx="200" cy="200" rx="180" ry="90"/>\
-          <ellipse fill="url(%23g)" cx="600" cy="240" rx="260" ry="120"/>\
-          <ellipse fill="url(%23g)" cx="1100" cy="180" rx="320" ry="150"/>\
-          <ellipse fill="url(%23g)" cx="1450" cy="280" rx="260" ry="120"/>\
+        <g opacity="0.9">\
+          <ellipse fill="url(%23g)" cx="220" cy="220" rx="220" ry="110"/>\
+          <ellipse fill="url(%23g)" cx="680" cy="240" rx="340" ry="160"/>\
+          <ellipse fill="url(%23g)" cx="1200" cy="180" rx="360" ry="170"/>\
         </g>\
-      </svg>');
-      background-repeat: repeat-x; background-size: 1600px 600px; background-position: 0 30%; opacity: .95; filter: blur(1px);
-    }
-    .blimp { pointer-events: none; background: url('data:image/svg+xml;utf8,\
-      <svg xmlns="http://www.w3.org/2000/svg" width="400" height="160" viewBox="0 0 400 160">\
-        <defs>\
-          <linearGradient id="skin" x1="0" x2="1">\
-            <stop offset="0%" stop-color="%231a2446"/>\
-            <stop offset="100%" stop-color="%232a3a76"/>\
-          </linearGradient>\
-        </defs>\
-        <g>\
-          <ellipse cx="200" cy="80" rx="170" ry="60" fill="url(%23skin)" stroke="%2380d4ff" stroke-width="2" opacity="0.95"/>\
-          <rect x="160" y="92" width="80" height="14" fill="%231a2446" rx="7"/>\
-          <polygon points="320,80 360,90 320,100" fill="%231a2446" opacity="0.9"/>\
-          <rect x="180" y="108" width="40" height="18" rx="4" fill="%23ffd580" opacity="0.85"/>\
-        </g>\
-      </svg>') no-repeat;
-      background-size: 400px 160px; background-position: var(--blimp-x, -30%) 12%; opacity: .9;
-      animation: blimp-drift 26s linear infinite;
-    }
-    @keyframes blimp-drift { 0% { --blimp-x: -40%; } 100% { --blimp-x: 120%; } }
-    .floating-isles {
-      background-image:
-        radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.35), transparent 70%),
-        radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.3), transparent 70%);
-    }
-    .city-silhouette {
-      mask: linear-gradient(180deg, rgba(0,0,0,.95) 20%, rgba(0,0,0,0) 100%);
-      background: url('data:image/svg+xml;utf8,\
+      </svg>'); background-repeat:repeat-x; background-size:1600px 600px; background-position:0 30%; }
+    .clouds-back{ opacity:.75; filter:blur(2px); }
+    .clouds-front{ opacity:.95; filter:blur(1px); }
+
+    /* Optional mood layers */
+    .floating-isles{ background-image: radial-gradient(1200px 600px at 30% 70%, rgba(26,36,70,.35), transparent 70%), radial-gradient(1000px 500px at 70% 60%, rgba(26,36,70,.3), transparent 70%); }
+    .city-silhouette{ mask:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,.9) 85%, rgba(0,0,0,1) 100%); background:url('data:image/svg+xml;utf8,\
         <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800">\
           <g fill="%231a2446" opacity="0.8">\
             <path d="M0 600h200l20-80 40-10 30-90 50 30 30-60 60 20 20-50 50 10 30-100 40 140 50-20 20 120h120l40-60 60 40 30-80 70 20 20-50 60 40 40-80 40 50 60-10 20 120h280v200H0z"/>\
           </g>\
-        </svg>') bottom center / cover no-repeat;
-      opacity: .8;
-    }
+        </svg>') bottom center/cover no-repeat; opacity:.8; }
 
-    .hero {
-      text-align: center; padding-top: 18vh; padding-bottom: 20vh;
-      text-shadow: 0 10px 30px rgba(0,0,0,.25);
-    }
-    .hero h1 { font-size: clamp(2.2rem, 6vw, 5rem); letter-spacing: .5px; margin: 0 0 .2em; }
-    .hero p.kicker { color: #14365c; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; font-size: .85rem; }
-    .hero .cta { margin-top: 18px; display: inline-flex; gap: 10px; }
-    .btn { display: inline-flex; align-items: center; gap: .5rem; padding: 10px 14px; border-radius: 14px; background: #1a2446; color: var(--fg); border: 1px solid rgba(255,255,255,.08); text-decoration: none; }
-    .btn:hover { background: #223163; }
+    /* Title layer (parallax) */
+    .title-layer{ display:grid; place-items:start center; padding-top:12vh; text-align:center; pointer-events:none; z-index:5; }
+    .title-layer h1{ font-size:clamp(3.2rem, 10vw, 7rem); line-height:1; margin:0; letter-spacing:.02em; color:#0f2a45; text-shadow:0 10px 30px rgba(0,0,0,.25); }
+    .title-layer .subtitle{ margin-top:.6rem; font-weight:700; color:#1d3f66; text-shadow:0 6px 24px rgba(0,0,0,.18); }
 
-    /* Scene 2: Surface / Descent */
-    .surface-gradient { background: linear-gradient(#76b8ff 0%, #0e4c8a 70%, #062138 100%); }
-    .sun-glow { background: radial-gradient(500px 300px at 50% 20%, rgba(255,213,128,.8), rgba(255,213,128,0) 60%); mix-blend-mode: screen; }
-    .waves { background-image: url('data:image/svg+xml;utf8,\
+    /* Scene 2: SURFACE / ABOUT */
+    .surface-gradient{ background:linear-gradient(#76b8ff 0%, #0e4c8a 70%, #062138 100%); }
+    .sun-glow{ background:radial-gradient(500px 300px at 50% 20%, rgba(255,213,128,.8), rgba(255,213,128,0) 60%); mix-blend-mode:screen; }
+    .waves{ background-image:url('data:image/svg+xml;utf8,\
       <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400">\
         <path d="M0,200 C300,100 500,300 800,200 C1100,100 1300,300 1600,200 L1600,400 L0,400 Z" fill="%23093b64" opacity="0.55"/>\
         <path d="M0,220 C300,120 500,320 800,220 C1100,120 1300,320 1600,220 L1600,400 L0,400 Z" fill="%230d4a7d" opacity="0.45"/>\
         <path d="M0,240 C300,140 500,340 800,240 C1100,140 1300,340 1600,240 L1600,400 L0,400 Z" fill="%2312589a" opacity="0.35"/>\
-      </svg>');
-      background-repeat: repeat-x; background-size: 1600px 400px; background-position: 0 80%; opacity: .8;
-    }
-    .bubbles { background-image: radial-gradient(circle at 20% 80%, rgba(255,255,255,.15) 0 2px, transparent 3px), radial-gradient(circle at 60% 70%, rgba(255,255,255,.15) 0 2px, transparent 3px), radial-gradient(circle at 80% 90%, rgba(255,255,255,.15) 0 2px, transparent 3px); background-size: 200px 200px; background-repeat: repeat; opacity: .6; }
+      </svg>'); background-repeat:repeat-x; background-size:1600px 400px; background-position:0 80%; opacity:.8; }
 
-    /* Scene 3: Rapture vibes */
-    .deep-gradient { background: radial-gradient(800px 500px at 50% 20%, #0a2a43, #061a2b 70%, #030c16 100%); }
-    .rapture-silhouette {
-      background: url('data:image/svg+xml;utf8,\
+    /* Scene 3: DEEP — bubbles at bottom */
+    .deep-gradient{ background:radial-gradient(800px 500px at 50% 20%, #0a2a43, #061a2b 70%, #030c16 100%); }
+    .shafts{ background:repeating-linear-gradient(180deg, rgba(128,212,255,.06) 0 8px, transparent 8px 24px); mix-blend-mode:screen; }
+    .abyss-bubbles{ background-image: radial-gradient(circle at 10% 120%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 40% 130%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 70% 125%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 90% 135%, rgba(255,255,255,.12) 0 2px, transparent 3px); background-size:300px 300px; background-repeat:repeat; opacity:.6; animation: rise 24s linear infinite; }
+    @keyframes rise{ from{ background-position-y:0; } to{ background-position-y:-600px; } }
+    .rapture-silhouette{ background:url('data:image/svg+xml;utf8,\
         <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
-          <g fill="%23061a2b" opacity="0.9">\
+          <g fill="%23061a2b" opacity="0.95">\
             <rect x="0" y="700" width="1600" height="200"/>\
             <path d="M50 700 L120 560 L180 700 Z"/>\
             <path d="M260 700 L320 520 L380 700 Z"/>\
@@ -147,49 +105,23 @@
             <path d="M980 700 L1040 540 L1100 700 Z"/>\
             <path d="M1250 700 L1300 500 L1360 700 Z"/>\
           </g>\
-        </svg>') bottom center / cover no-repeat;
-      opacity: .95;
-    }
-    .beasts {
-      background: url('data:image/svg+xml;utf8,\
-        <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">\
-          <g fill="%23030c16" opacity="0.6">\
-            <path d="M-100 800 C200 600 300 760 600 620 C760 540 900 700 1100 640 C1300 580 1500 720 1750 600 L1750 900 L-100 900 Z"/>\
-          </g>\
-          <g fill="%23040f1b" opacity="0.55">\
-            <path d="M200 780 Q260 740 320 760 T440 760 Q520 740 560 700 Q600 660 640 680 T720 720"/>\
-          </g>\
-          <g fill="%23040f1b" opacity="0.5">\
-            <circle cx="1180" cy="680" r="40"/>\
-            <circle cx="1212" cy="684" r="6" fill="%2380d4ff" opacity="0.7"/>\
-          </g>\
-        </svg>') bottom center / cover no-repeat;
-      opacity: .7;
-      filter: drop-shadow(0 20px 60px rgba(0,0,0,.6));
-    }
-    .shafts { background: repeating-linear-gradient(180deg, rgba(128,212,255,.06) 0 8px, transparent 8px 24px); mix-blend-mode: screen; }
-    .abyss-bubbles { background-image: radial-gradient(circle at 10% 120%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 40% 130%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 70% 125%, rgba(255,255,255,.12) 0 2px, transparent 3px), radial-gradient(circle at 90% 135%, rgba(255,255,255,.12) 0 2px, transparent 3px); background-size: 300px 300px; background-repeat: repeat; opacity: .6; animation: rise 24s linear infinite; }
-    @keyframes rise { from { background-position-y: 0; } to { background-position-y: -600px; }
+        </svg>') bottom center/cover no-repeat; opacity:.95; }
 
     /* Text blocks */
-    .card { background: rgba(26,36,70,.55); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: clamp(16px, 3vw, 28px); box-shadow: 0 20px 60px rgba(0,0,0,.35); }
-    .card h2 { margin-top: 0; letter-spacing: .5px; }
-    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card{ background:rgba(26,36,70,.55); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:clamp(16px, 3vw, 28px); box-shadow:0 20px 60px rgba(0,0,0,.35); }
+    .card h2{ margin-top:0; letter-spacing:.5px; }
+    .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); }
 
-    /* Footer */
-    footer.site { padding: 40px var(--pad); text-align: center; color: var(--muted); }
+    footer.site{ padding:40px var(--pad); text-align:center; color:var(--muted); }
 
     /* Motion & Parallax */
-    @media (prefers-reduced-motion: no-preference) {
-      .parallax [data-speed] { transform: translateY(calc(var(--scroll, 0) * var(--speed, 0))); }
-      .floaty { animation: float 6s ease-in-out infinite; }
-      @keyframes float { 0%,100% { transform: translateY(-4px) } 50% { transform: translateY(4px) } }
+    @media (prefers-reduced-motion: no-preference){
+      .parallax [data-speed]{ transform: translateY(calc(var(--scroll, 0) * var(--speed, 0))); }
+      .floaty{ animation: float 6s ease-in-out infinite; }
+      @keyframes float{ 0%,100%{ transform: translateY(-4px) } 50%{ transform: translateY(4px) } }
     }
 
-    @media (max-width: 640px) {
-      header .bar { gap: 8px; }
-      .hero h1 { font-size: clamp(2rem, 9vw, 3.2rem); }
-    }
+    @media (max-width:640px){ header .bar{ gap:8px; } .title-layer h1{ font-size:clamp(2.4rem, 12vw, 4rem); } section.panel{ min-height:160vh; } }
   </style>
 </head>
 <body>
@@ -197,61 +129,55 @@
     <div class="bar">
       <div class="dot" aria-hidden="true"></div>
       <nav>
-        <a href="#sky">Sky City</a>
+        <a href="#sky">Sky</a>
         <a href="#surface">Surface</a>
         <a href="#deep">Underwater</a>
-        <a href="#contact">Contact</a>
       </nav>
     </div>
   </header>
 
   <!-- =====================
-       SCENE 1 — SKY CITY
+       SCENE 1 — SKY (clouds only up top)
   ====================== -->
   <section id="sky" class="panel">
     <div class="stage parallax" aria-hidden="true">
-      <div class="layer sky-gradient" data-speed="0.08"></div>
-      <div class="layer sun-rays" data-speed="0.10"></div>
-      <div class="layer clouds" data-speed="0.16"></div>
-      <div class="layer blimp" data-speed="0.22"></div>
-      <div class="layer floating-isles" data-speed="0.28"></div>
-      <div class="layer city-silhouette" data-speed="0.36"></div>
-    </div>
-
-    <div class="content hero">
-      <p class="kicker">Interactive Portfolio</p>
-      <h1 class="floaty">Hi, I'm Mike Wand.</h1>
-      <p class="lead">I design & build animated, user‑friendly experiences. Scroll to descend from a sky city into the deep.</p>
-      <div class="cta">
-        <a class="btn" href="#surface" aria-label="Descend to the ocean surface">Start Descent ↓</a>
-        <a class="btn" href="#projects">See Projects</a>
+      <div class="layer sky-gradient" data-speed="0.05"></div>
+      <div class="layer sun-rays" data-speed="0.08"></div>
+      <div class="layer clouds-back" data-speed="0.10"></div>
+      <div class="layer clouds-front" data-speed="0.14"></div>
+      <!-- City fades in near bottom of section for mood; remove if you want pure sky. -->
+      <div class="layer floating-isles" data-speed="0.18"></div>
+      <div class="layer city-silhouette" data-speed="0.28"></div>
+      <!-- Title floats for the first stretch of scroll -->
+      <div class="layer title-layer" data-speed="0.22">
+        <h1>Mike Wand</h1>
+        <p class="subtitle">Artsy, animated, and user‑friendly on purpose.</p>
       </div>
     </div>
+
+    <div class="content" aria-hidden="true"></div>
   </section>
 
   <!-- =====================
-       SCENE 2 — SURFACE
+       SCENE 2 — SURFACE / ABOUT
   ====================== -->
   <section id="surface" class="panel">
     <div class="stage parallax" aria-hidden="true">
-      <div class="layer surface-gradient" data-speed="0.10"></div>
-      <div class="layer sun-glow" data-speed="0.12"></div>
-      <div class="layer waves" data-speed="0.20"></div>
-      <div class="layer bubbles" data-speed="0.28"></div>
+      <div class="layer surface-gradient" data-speed="0.06"></div>
+      <div class="layer sun-glow" data-speed="0.08"></div>
+      <div class="layer waves" data-speed="0.12"></div>
     </div>
 
     <div class="content">
       <div class="card">
         <h2>About Mike</h2>
-        <p>
-          Front‑end developer with a love for motion design, performance, and bringing playful ideas to life. I’ve worked on creative tooling (Gulp → Vite), component systems, and production‑ready builds at scale. My personal work leans whimsical — like this little sky‑to‑sea journey.
-        </p>
-        <div class="grid" style="margin-top: 14px;">
+        <p>Front‑end developer who loves motion design, performance, and playful UX. This site is a scroll story: sky → surface → deep, built in vanilla HTML/CSS/JS with accessibility in mind.</p>
+        <div class="grid" style="margin-top:14px;">
           <div>
             <h3>Focus</h3>
             <ul>
               <li>Accessible animation</li>
-              <li>Design‑systems thinking</li>
+              <li>Design systems & craft</li>
               <li>Performance & DX</li>
             </ul>
           </div>
@@ -264,11 +190,10 @@
             </ul>
           </div>
           <div>
-            <h3>Currently</h3>
+            <h3>Links</h3>
             <ul>
-              <li>Rebuilding <em>MikeWand.com</em></li>
-              <li>Experimenting with scroll stories</li>
-              <li>Open to collab & ideas</li>
+              <li><a href="https://github.com/MikeyWand" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://codepen.io/MikeWand" target="_blank" rel="noopener">CodePen</a></li>
             </ul>
           </div>
         </div>
@@ -277,90 +202,78 @@
   </section>
 
   <!-- =====================
-       SCENE 3 — DEEP / RAPTURE VIBES
+       SCENE 3 — DEEP (bubbles at bottom)
   ====================== -->
   <section id="deep" class="panel">
     <div class="stage parallax" aria-hidden="true">
-      <div class="layer deep-gradient" data-speed="0.06"></div>
-      <div class="layer shafts" data-speed="0.12"></div>
-      <div class="layer beasts" data-speed="0.20"></div>
-      <div class="layer abyss-bubbles" data-speed="0.18"></div>
-      <div class="layer rapture-silhouette" data-speed="0.30"></div>
+      <div class="layer deep-gradient" data-speed="0.05"></div>
+      <div class="layer shafts" data-speed="0.10"></div>
+      <div class="layer abyss-bubbles" data-speed="0.16"></div>
+      <div class="layer rapture-silhouette" data-speed="0.24"></div>
     </div>
 
-    <div class="content" id="projects">
-      <div class="card">
+    <div class="content">
+      <div class="card" id="projects">
         <h2>Projects</h2>
-        <p>Hand‑picked work that pairs craft with performance. More soon — for now, placeholders:</p>
-        <div class="grid" style="margin-top: 16px;">
+        <p>Add links/screenshots here and I’ll wire them into the layout.</p>
+        <div class="grid" style="margin-top:16px;">
           <div class="card" style="background: rgba(255,255,255,.02);">
             <h3>Parallax Story Engine</h3>
             <p>Lightweight scroll controller powering this page (no frameworks). Plug layers, set speeds, go.</p>
-            <a href="#" aria-disabled="true">Case study (coming)</a>
           </div>
           <div class="card" style="background: rgba(255,255,255,.02);">
             <h3>Build Pipeline Revamp</h3>
-            <p>Migrated legacy Gulp builds to Vite with single‑file outputs, image revving, and DM Classic paths.</p>
-            <a href="#" aria-disabled="true">Write‑up (coming)</a>
+            <p>Migrated legacy Gulp builds to Vite with single‑file outputs and image revving.</p>
           </div>
           <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>CodePen Experiments</h3>
-            <p>Small interactions & visual toys I tinker with.</p>
-            <a href="https://codepen.io/MikeWand" target="_blank" rel="noopener">View CodePen profile ↗</a>
-          </div>
-          <div class="card" style="background: rgba(255,255,255,.02);">
-            <h3>GitHub</h3>
-            <p>Source for this site and other public bits.</p>
-            <a href="https://github.com/MikeyWand" target="_blank" rel="noopener">Visit GitHub profile ↗</a>
+            <h3>Micro‑Interactions</h3>
+            <p>Small, delightful components — buttons with personality that still pass a11y audits.</p>
           </div>
         </div>
       </div>
 
-      <div class="card" id="contact" style="margin-top: 18px; text-align:center;">
+      <div class="card" id="contact" style="margin-top:18px; text-align:center;">
         <h2>Say hello</h2>
-        <p>
-          <a href="mailto:mikewand@gmail.com" class="btn">✉️  mikewand@gmail.com</a>
-        </p>
+        <p><a href="mailto:mikewand@gmail.com" class="btn" style="display:inline-block; padding:10px 14px; border-radius:14px; background:#1a2446; color:var(--fg); border:1px solid rgba(255,255,255,.08); text-decoration:none;">✉️  mikewand@gmail.com</a></p>
         <p style="color: var(--muted); font-size: .95rem;">Last updated: <span id="lastUpdated">—</span></p>
       </div>
     </div>
   </section>
 
   <footer class="site">
-    <small>© <span id="year"></span> Mike Wand. Built with vanilla HTML/CSS/JS. Respecting <code>prefers-reduced-motion</code>.</small>
+    <small>© <span id="year"></span> Mike Wand. Built with vanilla HTML/CSS/JS. Respects <code>prefers-reduced-motion</code>.</small>
   </footer>
 
   <script>
     // ---------------------------
     // Parallax Controller
     // ---------------------------
-    (function() {
+    (function(){
       const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced) return; // bail on motion-sensitive users
 
       const layers = Array.from(document.querySelectorAll('.parallax [data-speed]'));
+      layers.forEach(el => { el.style.setProperty('--speed', parseFloat(el.getAttribute('data-speed')) || 0); });
 
-      function tick() {
-        // Use scrollY as a single driver — cheap and cheerful
-        const s = window.scrollY || 0;
-        // expose to CSS as a variable; each layer multiplies by its own speed
-        document.documentElement.style.setProperty('--scroll', s);
-        requestAnimationFrame(tick);
+      let ticking = false;
+      function onScroll(){
+        if(!ticking){
+          window.requestAnimationFrame(() => {
+            const s = window.scrollY || 0;
+            document.documentElement.style.setProperty('--scroll', s);
+            ticking = false;
+          });
+          ticking = true;
+        }
       }
-      requestAnimationFrame(tick);
-
-      // Also set each element's speed as a CSS var for the transform formula
-      layers.forEach(el => {
-        const v = parseFloat(el.getAttribute('data-speed')) || 0;
-        el.style.setProperty('--speed', v);
-      });
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive:true });
     })();
 
-    // ---------------------------
     // Footer helpers
-    // ---------------------------
     document.getElementById('year').textContent = new Date().getFullYear();
-    document.getElementById('lastUpdated').textContent = new Date(document.lastModified).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' });
+    const lu = document.getElementById('lastUpdated');
+    if(lu){ lu.textContent = new Date(document.lastModified).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' }); }
   </script>
 </body>
 </html>
